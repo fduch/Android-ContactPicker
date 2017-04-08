@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
@@ -42,6 +43,7 @@ import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactDescription;
+import com.onegravity.contactpicker.contact.ContactFragment;
 import com.onegravity.contactpicker.contact.ContactSelectionChanged;
 import com.onegravity.contactpicker.contact.ContactSortOrder;
 import com.onegravity.contactpicker.contact.ContactsLoaded;
@@ -333,37 +335,9 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
 
         setContentView(R.layout.cp_contact_tab_layout);
-
-        // initialize TabLayout
-        TabLayout tabLayout = (TabLayout)findViewById(R.id.tabContent);
-        tabLayout.setTabMode(TabLayout.MODE_FIXED);
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
-        TabLayout.Tab tabContacts = tabLayout.newTab();
-        tabContacts.setText(R.string.cp_contact_tab_title);
-        tabLayout.addTab(tabContacts);
-
-        TabLayout.Tab tabGroups = tabLayout.newTab();
-        tabGroups.setText(R.string.cp_group_tab_title);
-        tabLayout.addTab(tabGroups);
-
-        // initialize ViewPager
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.tabPager);
-        mAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
-                mSortOrder, mBadgeType, mDescription, mDescriptionType);
-        viewPager.setAdapter(mAdapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
-        });
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.contact_fragment_container, ContactFragment.newInstance(mSortOrder, mBadgeType, mDescription, mDescriptionType));
+        transaction.commit();
     }
 
     @Override
