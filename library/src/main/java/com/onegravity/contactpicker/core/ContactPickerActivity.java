@@ -207,11 +207,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private static final int BATCH_SIZE = 50;
 
     /*
-     * The selected ids are saved in onSaveInstanceState, restored in onCreate and then applied to
+     * The selected lookup keys are saved in onSaveInstanceState, restored in onCreate and then applied to
      * the contacts and groups in onLoadFinished.
      */
     private static final String CONTACT_IDS = "CONTACT_IDS";
-    private HashSet<Long> mSelectedContactIds = new HashSet<>();
+    private HashSet<String> mSelectedContactIds = new HashSet<>();
 
     private static final String GROUP_IDS = "GROUP_IDS";
     private HashSet<Long> mSelectedGroupIds = new HashSet<>();
@@ -262,7 +262,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
             }
 
             if(intent.hasExtra(EXTRA_PRESELECTED_CONTACTS)) {
-                Collection<Long> preselectedContacts = (Collection<Long>) intent.getSerializableExtra( EXTRA_PRESELECTED_CONTACTS );
+                Collection<String> preselectedContacts = (Collection<String>) intent.getSerializableExtra( EXTRA_PRESELECTED_CONTACTS );
                 mSelectedContactIds.addAll(preselectedContacts);
             }
 
@@ -280,7 +280,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
             // Retrieve selected contact and group ids.
             try {
-                mSelectedContactIds = (HashSet<Long>) savedInstanceState.getSerializable(CONTACT_IDS);
+                mSelectedContactIds = (HashSet<String>) savedInstanceState.getSerializable(CONTACT_IDS);
                 mSelectedGroupIds = (HashSet<Long>) savedInstanceState.getSerializable(GROUP_IDS);
             }
             catch (ClassCastException ignore) {}
@@ -367,7 +367,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         mSelectedContactIds.clear();;
         for (Contact contact : mContacts) {
             if (contact.isChecked()) {
-                mSelectedContactIds.add( contact.getId() );
+                mSelectedContactIds.add( contact.getLookupKey() );
             }
         }
         outState.putSerializable(CONTACT_IDS, mSelectedContactIds);
@@ -583,7 +583,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
                 String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
                 mContactsByLookupKey.put(lookupKey, contact);
 
-                boolean isChecked = mSelectedContactIds.contains( contact.getId() );
+                boolean isChecked = mSelectedContactIds.contains( contact.getLookupKey() );
                 contact.setChecked(isChecked, true);
                 mNrOfSelectedContacts += isChecked ? 1 : 0;
 
